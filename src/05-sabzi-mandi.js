@@ -31,4 +31,32 @@
  */
 export function sabziMandiBill(shoppingList, priceList) {
   // Your code here
+  const result = {
+    items: [],
+    totalBill: 0,
+  };
+
+  for (const item of shoppingList) {
+    const { name, qty } = item;
+
+    // condition (a) — sabzi mandi mein available nahi
+    if (!(name in priceList)) continue;
+
+    const price = priceList[name];
+
+    // condition (b) — bahut mehenga
+    if (price > 80) continue;
+
+    const cost = price * qty;
+
+    result.items.push({
+      name,
+      qty,
+      cost,
+    });
+
+    result.totalBill += cost;
+  }
+
+  return result;
 }

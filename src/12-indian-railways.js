@@ -46,4 +46,87 @@
  */
 export function railwayReservation(passengers, trains) {
   // Your code here
+  // Validation
+  if (
+    !Array.isArray(passengers) ||
+    !Array.isArray(trains) ||
+    passengers.length === 0 ||
+    trains.length === 0
+  ) {
+    return [];
+  }
+
+  const result = [];
+
+  // Process passengers in FIFO order
+  for (let i = 0; i < passengers.length; i++) {
+    const passenger = passengers[i];
+    let trainFound = false;
+
+    // Find matching train (Nested Loop)
+    for (let j = 0; j < trains.length; j++) {
+      const train = trains[j];
+
+      if (train.trainNumber === passenger.trainNumber) {
+        trainFound = true;
+
+        const preferredClass = passenger.preferred;
+        const fallbackClass = passenger.fallback;
+
+        // 1️⃣ Try Preferred Class
+        if (
+          train.seats[preferredClass] !== undefined &&
+          train.seats[preferredClass] > 0
+        ) {
+          train.seats[preferredClass]--; // MUTATION
+
+          result.push({
+            name: passenger.name,
+            trainNumber: passenger.trainNumber,
+            class: preferredClass,
+            status: "confirmed",
+          });
+        }
+
+        // 2️⃣ Try Fallback Class
+        else if (
+          train.seats[fallbackClass] !== undefined &&
+          train.seats[fallbackClass] > 0
+        ) {
+          train.seats[fallbackClass]--; // MUTATION
+
+          result.push({
+            name: passenger.name,
+            trainNumber: passenger.trainNumber,
+            class: fallbackClass,
+            status: "confirmed",
+          });
+        }
+
+        // 3️⃣ Waitlist
+        else {
+          result.push({
+            name: passenger.name,
+            trainNumber: passenger.trainNumber,
+            class: preferredClass,
+            status: "waitlisted",
+          });
+        }
+
+        break; // Train mil gaya, inner loop break
+      }
+    }
+
+    // 4️⃣ Train Not Found
+    if (!trainFound) {
+      result.push({
+        name: passenger.name,
+        trainNumber: passenger.trainNumber,
+        class: null,
+        status: "train_not_found",
+      });
+    }
+  }
+
+  return result;
 }
